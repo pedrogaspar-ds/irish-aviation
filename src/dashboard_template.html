@@ -2,103 +2,983 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Irish Aviation Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Twenty one years of Irish aviation</title>
+<meta name="description" content="Every passenger through every Irish airport since 2005, from CSO open data.">
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--text:#1b2430;--muted:#5d6775;--line:#d9dde3;--blue:#1f5fa8;--orange:#d9822b;--grey:#8a8f98;--red:#b23b3b}
-@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b222b;--text:#e8ecf1;--muted:#a3adba;--line:#34404e;--blue:#5aa0ee;--orange:#f0a050;--grey:#8f98a5;--red:#e07070}}
+:root{
+  --bg:#f7f8fa; --bg2:#eef1f5; --card:#ffffff; --line:#dde2e9; --line2:#e9edf2;
+  --ink:#121a24; --ink2:#46525f; --ink3:#75808d;
+  --accent:#0f7a5a; --accent2:#1aa87c; --accent-soft:#d7f0e6;
+  --warm:#c2601c; --warm-soft:#fbe7d6; --cool:#2563a8; --bad:#a6342f;
+  --grid:#e4e9ef; --shadow:0 1px 2px rgba(16,25,35,.05),0 8px 24px -12px rgba(16,25,35,.18);
+  --serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b1016; --bg2:#0e141b; --card:#141b24; --line:#253140; --line2:#1c252f;
+    --ink:#e8eef5; --ink2:#a6b3c2; --ink3:#73818f;
+    --accent:#35c08f; --accent2:#5fd9ad; --accent-soft:#12302a;
+    --warm:#e8a35c; --warm-soft:#33261a; --cool:#6aa7e8; --bad:#e2736c;
+    --grid:#1e2733; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b1016; --bg2:#0e141b; --card:#141b24; --line:#253140; --line2:#1c252f;
+  --ink:#e8eef5; --ink2:#a6b3c2; --ink3:#73818f;
+  --accent:#35c08f; --accent2:#5fd9ad; --accent-soft:#12302a;
+  --warm:#e8a35c; --warm-soft:#33261a; --cool:#6aa7e8; --bad:#e2736c;
+  --grid:#1e2733; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -14px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:960px;margin:0 auto;padding:20px 16px 40px}
-h1{font-size:1.6rem;margin:0 0 4px}
-.sub{color:var(--muted);margin:0 0 20px;font-size:.95rem}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
-.kpi b{display:block;font-size:2rem;line-height:1.1;color:var(--blue)}
-.kpi span{color:var(--muted);font-size:.85rem}
-section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:16px}
-h2{font-size:1.05rem;margin:0 0 8px}
-svg{width:100%;height:auto;display:block}
-svg text{fill:var(--text);font-family:inherit}
-svg .m{fill:var(--muted)}
-svg .ax{stroke:var(--line);stroke-width:1}
-p.cap{margin:8px 0 0;color:var(--muted);font-size:.92rem}
-footer{color:var(--muted);font-size:.85rem;margin-top:8px}
-a{color:var(--blue)}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  max-width:1120px; margin:0 auto;
+  padding-left:max(20px,env(safe-area-inset-left,0px));
+  padding-right:max(20px,env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--serif); font-weight:600; text-wrap:balance; margin:0}
+a{color:var(--accent); text-underline-offset:3px}
+
+/* ---------------------------------------------------------------- header */
+header.top{
+  border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(1100px 420px at 78% -12%, var(--accent-soft), transparent 62%),
+    linear-gradient(180deg,var(--bg2),var(--bg));
+  padding-block:clamp(44px,7vw,84px) clamp(32px,5vw,52px);
+}
+.eyebrow{
+  font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); font-weight:650; margin-bottom:16px;
+}
+h1{font-size:clamp(34px,6.2vw,62px); line-height:1.04; letter-spacing:-.02em; max-width:17ch}
+.standfirst{
+  margin-top:20px; max-width:64ch; font-size:clamp(16px,1.9vw,19px);
+  color:var(--ink2); line-height:1.65;
+}
+.byline{
+  margin-top:26px; display:flex; flex-wrap:wrap; gap:8px 18px;
+  font-size:13px; color:var(--ink3);
+}
+.byline b{color:var(--ink2); font-weight:600}
+
+/* ---------------------------------------------------------------- kpis */
+.kpis{
+  display:grid; gap:14px; margin-top:clamp(28px,4vw,40px);
+  grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+}
+.kpi{
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:18px 18px 14px; box-shadow:var(--shadow); min-width:0;
+}
+.kpi .label{font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink3); font-weight:650}
+.kpi .value{
+  font-size:clamp(28px,3.4vw,36px); font-weight:680; letter-spacing:-.025em;
+  margin-top:8px; line-height:1; font-variant-numeric:tabular-nums;
+}
+.kpi .value small{font-size:.5em; font-weight:600; color:var(--ink2); letter-spacing:0}
+.kpi .note{font-size:13px; color:var(--ink2); margin-top:8px; line-height:1.45}
+.kpi svg{display:block; margin-top:12px; width:100%; height:34px; overflow:visible}
+
+/* ---------------------------------------------------------------- sections */
+section{padding-block:clamp(42px,6vw,72px); border-top:1px solid var(--line2)}
+section:first-of-type{border-top:0}
+.sec-head{max-width:70ch; margin-bottom:26px}
+.sec-n{
+  font-family:var(--mono); font-size:12px; color:var(--accent);
+  letter-spacing:.1em; font-weight:600;
+}
+h2{font-size:clamp(23px,3.1vw,32px); letter-spacing:-.015em; margin-top:10px; line-height:1.18}
+.sec-head p{margin:12px 0 0; color:var(--ink2); font-size:16px}
+.takeaway{
+  margin-top:20px; padding:14px 18px; border-left:3px solid var(--accent);
+  background:var(--card); border-radius:0 10px 10px 0; font-size:15px; color:var(--ink2);
+}
+.takeaway b{color:var(--ink); font-weight:650}
+
+.panel{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:clamp(14px,2.2vw,22px); box-shadow:var(--shadow); min-width:0;
+}
+.chart{position:relative; width:100%; min-width:0}
+.chart svg{display:block; width:100%; height:auto; overflow:visible}
+
+/* axes and marks */
+.gridline{stroke:var(--grid); stroke-width:1}
+.axis text{fill:var(--ink3); font-size:11.5px; font-family:var(--sans)}
+.axis text.strong{fill:var(--ink2); font-weight:600}
+.serie{fill:none; stroke-linejoin:round; stroke-linecap:round}
+.annot line{stroke:var(--ink3); stroke-dasharray:3 3; stroke-width:1}
+.annot text{fill:var(--ink2); font-size:11.5px; font-family:var(--sans)}
+.annot text.t{fill:var(--ink); font-weight:650}
+.hit{fill:transparent}
+.focus circle{stroke:var(--card); stroke-width:2.5}
+.focus line{stroke:var(--ink3); stroke-width:1; stroke-dasharray:3 3}
+
+/* tooltip */
+.tip{
+  position:absolute; pointer-events:none; opacity:0; transform:translate(-50%,-115%);
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  padding:9px 12px; box-shadow:var(--shadow); font-size:13px; white-space:nowrap;
+  transition:opacity .12s ease; z-index:5; min-width:120px;
+}
+.tip .tt{font-weight:650; margin-bottom:4px; font-size:12px; color:var(--ink3);
+  letter-spacing:.06em; text-transform:uppercase}
+.tip .tv{font-variant-numeric:tabular-nums; font-weight:600; font-size:15px}
+.tip .tr{display:flex; justify-content:space-between; gap:16px; font-variant-numeric:tabular-nums}
+.tip .tr span:first-child{color:var(--ink2)}
+.tip .sw{display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:7px}
+
+/* controls */
+.controls{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px}
+.chip{
+  font:inherit; font-size:13px; font-weight:560; cursor:pointer;
+  background:var(--bg2); color:var(--ink2); border:1px solid var(--line);
+  border-radius:999px; padding:6px 13px; transition:.15s ease;
+  display:inline-flex; align-items:center; gap:7px;
+}
+.chip:hover{color:var(--ink); border-color:var(--ink3)}
+.chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:#fff}
+.chip .dot{width:9px; height:9px; border-radius:50%; flex:none}
+.seg{display:inline-flex; background:var(--bg2); border:1px solid var(--line); border-radius:999px; padding:3px}
+.seg button{
+  font:inherit; font-size:13px; font-weight:560; cursor:pointer; border:0; background:transparent;
+  color:var(--ink2); border-radius:999px; padding:5px 14px; transition:.15s ease;
+}
+.seg button[aria-pressed="true"]{background:var(--accent); color:#fff}
+.search{
+  font:inherit; font-size:13.5px; padding:7px 13px; border-radius:999px;
+  border:1px solid var(--line); background:var(--bg2); color:var(--ink); min-width:170px;
+}
+.search::placeholder{color:var(--ink3)}
+.search:focus{outline:2px solid var(--accent); outline-offset:1px}
+
+/* ranked bars */
+.ranked{display:grid; gap:7px}
+.row{
+  display:grid; grid-template-columns:minmax(96px,150px) 1fr minmax(78px,auto);
+  align-items:center; gap:12px; font-size:14px;
+}
+.row .nm{color:var(--ink2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.row .track{background:var(--bg2); border-radius:5px; height:22px; position:relative; overflow:hidden}
+.row .fill{
+  position:absolute; inset:0 auto 0 0; border-radius:5px; width:0;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  transition:width .55s cubic-bezier(.22,.8,.3,1);
+}
+.row.neg .fill{background:linear-gradient(90deg,var(--bad),var(--warm))}
+.row .vl{text-align:right; font-variant-numeric:tabular-nums; font-weight:600; font-size:13.5px}
+.row .vl i{font-style:normal; color:var(--ink3); font-weight:500; font-size:12px}
+.row:hover .nm{color:var(--ink)}
+
+/* heatmap */
+.heat{width:100%; overflow-x:auto}
+.heat svg{min-width:560px}
+.legend{display:flex; align-items:center; gap:10px; margin-top:14px; font-size:12px; color:var(--ink3)}
+.legend .ramp{height:9px; width:160px; border-radius:5px}
+
+/* small multiples */
+.sm-grid{display:grid; gap:13px; grid-template-columns:repeat(auto-fit,minmax(195px,1fr))}
+.sm{background:var(--bg2); border:1px solid var(--line2); border-radius:12px; padding:13px 14px; min-width:0}
+.sm .nm{font-weight:650; font-size:14.5px; display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.sm .d{font-size:13px; font-weight:650; font-variant-numeric:tabular-nums}
+.sm .up{color:var(--accent)}
+.sm .sub{font-size:12px; color:var(--ink3); margin-top:2px; font-variant-numeric:tabular-nums}
+.sm svg{margin-top:9px; height:52px}
+
+.two{display:grid; gap:16px; grid-template-columns:1fr}
+@media (min-width:860px){ .two.split{grid-template-columns:1.35fr .65fr} }
+
+.notecols{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin-top:8px}
+.notecols h3{font-size:16px; margin-bottom:6px}
+.notecols p, .notecols li{font-size:14px; color:var(--ink2); margin:0}
+.notecols ul{margin:0; padding-left:18px; display:grid; gap:5px}
+code{font-family:var(--mono); font-size:.88em; background:var(--bg2); padding:2px 5px; border-radius:4px}
+
+footer{border-top:1px solid var(--line); padding-block:34px 56px; color:var(--ink3); font-size:13.5px}
+footer a{font-weight:560}
+.theme-btn{
+  position:fixed; right:16px; bottom:16px; z-index:20;
+  width:40px; height:40px; border-radius:50%; cursor:pointer;
+  border:1px solid var(--line); background:var(--card); color:var(--ink2);
+  box-shadow:var(--shadow); font-size:16px; line-height:1;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.theme-btn:hover{color:var(--ink)}
+@media print{.theme-btn{display:none}}
 </style>
 </head>
 <body>
-<main>
-<h1>Irish Aviation: Dublin Airport in Numbers</h1>
-<p class="sub">Official CSO Ireland aviation statistics, passengers only. Data to June 2026.</p>
-<div class="kpis" id="kpis"></div>
-<section><h2>1. Recovery against 2019</h2><div id="c1"></div><p class="cap" id="t1"></p></section>
-<section><h2>2. Seasonality by month</h2><div id="c2"></div><p class="cap" id="t2"></p></section>
-<section><h2>3. Growth by country market, 2022 to 2025</h2><div id="c3"></div><p class="cap" id="t3"></p></section>
-<section><h2>4. Dublin share of Irish airports</h2><div id="c4"></div><p class="cap" id="t4"></p></section>
-<section><h2>5. Market concentration, 2025</h2><div id="c5"></div><p class="cap" id="t5"></p></section>
-<footer>Source: CSO Ireland tables TAA05, TAM08 and TAA06, via data.cso.ie. Built with SQLite and Python.</footer>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Central Statistics Office &middot; open data</div>
+    <h1>Twenty one years of Irish aviation</h1>
+    <p class="standfirst">
+      Irish airports carried a record number of passengers in 2025, more than in any year
+      before the financial crisis and more than in any year before the pandemic. This is the
+      whole series, from 2005 to the latest month published, with the questions I asked of it
+      and the answers the data actually gives.
+    </p>
+    <div class="byline">
+      <span><b>Pedro Gaspar</b></span>
+      <span>Source: CSO tables TAA05, TAA06 and TAM08</span>
+      <span id="built"></span>
+      <span>Built with Python, SQL and SQLite</span>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">01</div>
+      <h2>Two crashes and a record</h2>
+      <p>
+        Annual passengers through every airport in the State. Two collapses sit in this line,
+        and they behaved nothing alike.
+      </p>
+    </div>
+    <div class="panel">
+      <div class="chart" id="c-annual"></div>
+    </div>
+    <div class="takeaway" id="t-annual"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">02</div>
+      <h2>The recovery, month by month</h2>
+      <p>
+        Monthly passengers since January 2019. Pick an airport to see how differently each one
+        came back.
+      </p>
+    </div>
+    <div class="panel">
+      <div class="controls" id="k-monthly"></div>
+      <div class="chart" id="c-monthly"></div>
+    </div>
+    <div class="takeaway" id="t-monthly"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">03</div>
+      <h2>Every month since 2019, as a grid</h2>
+      <p>
+        The same numbers laid out month by month and year by year. The hole in the middle is
+        the part no annual total can show you.
+      </p>
+    </div>
+    <div class="panel">
+      <div class="heat chart" id="c-heat"></div>
+      <div class="legend">
+        <span>Fewer</span><div class="ramp" id="ramp"></div><span>More passengers</span>
+      </div>
+    </div>
+    <div class="takeaway" id="t-heat"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">04</div>
+      <h2>Where Ireland flies</h2>
+      <p>
+        Passengers by country in 2025, and how each market has moved since 2022, the first
+        full year after the restrictions ended.
+      </p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="seg" id="k-market">
+          <button data-v="share" aria-pressed="true">Share of traffic</button>
+          <button data-v="growth" aria-pressed="false">Growth since 2022</button>
+        </div>
+        <input class="search" id="q-market" type="search" placeholder="Filter country" aria-label="Filter country">
+      </div>
+      <div class="ranked" id="c-market"></div>
+    </div>
+    <div class="takeaway" id="t-market"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">05</div>
+      <h2>How concentrated is it?</h2>
+      <p>
+        Markets ranked largest first, with the running share of all country traffic they
+        account for.
+      </p>
+    </div>
+    <div class="panel">
+      <div class="chart" id="c-pareto"></div>
+    </div>
+    <div class="takeaway" id="t-pareto"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">06</div>
+      <h2>Six airports, six different stories</h2>
+      <p>
+        Each airport across the full series, on its own scale, with where it stands against
+        2019.
+      </p>
+    </div>
+    <div class="sm-grid" id="c-airports"></div>
+    <div class="takeaway" id="t-airports"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">07</div>
+      <h2>Passengers are not the only thing moving</h2>
+      <p>
+        Passengers, freight and flight movements since 2020, each indexed to 100. When the
+        three lines separate, something changed in how the traffic is carried.
+      </p>
+    </div>
+    <div class="two split">
+      <div class="panel"><div class="chart" id="c-ops"></div></div>
+      <div class="panel"><div class="chart" id="c-ppf"></div></div>
+    </div>
+    <div class="takeaway" id="t-ops"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="sec-n">08</div>
+      <h2>How this was built</h2>
+    </div>
+    <div class="panel">
+      <div class="notecols">
+        <div>
+          <h3>Data</h3>
+          <p>Three CSO PxStat tables, pulled through the public API and stored exactly as
+          received in <code>data/raw/</code>: TAA05 annual passengers by airport, TAM08
+          monthly passengers, TAA06 passengers, freight and flights by market.</p>
+        </div>
+        <div>
+          <h3>Model</h3>
+          <p>Loaded into SQLite as two dimensions and three fact tables, with foreign keys and
+          check constraints, so a bad direction or flight type cannot enter. Every figure here
+          comes from a query over that database, none is typed by hand.</p>
+        </div>
+        <div>
+          <h3>Reproduce it</h3>
+          <ul>
+            <li><code>python src/fetch.py</code></li>
+            <li><code>python src/build_db.py</code></li>
+            <li><code>python src/build_dashboard.py</code></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Caveats</h3>
+          <ul>
+            <li>2026 covers January to June only.</li>
+            <li>Market detail starts in 2020, so no market comparison reaches back to 2019.</li>
+            <li>Passengers per flight divides all passengers by all flight movements, including flights that carried only freight.</li>
+            <li>Country figures exclude flights whose market the CSO does not break out.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </main>
+
+<footer class="wrap">
+  <p>
+    Built by Pedro Gaspar. Code, SQL and raw data at
+    <a href="https://github.com/pedrogaspar-ds/irish-aviation">github.com/pedrogaspar-ds/irish-aviation</a>.
+    Data &copy; Central Statistics Office Ireland, reused under the CC BY 4.0 licence.
+    No part of this page loads anything from the network.
+  </p>
+</footer>
+
+<button class="theme-btn" id="theme" title="Switch theme" aria-label="Switch theme">&#9681;</button>
+
 <script>
-const D=/*__DATA__*/null;
-const W=520;
-const f1=n=>n.toFixed(1);
-const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
-const nice=(max,steps)=>{const s=Math.pow(10,Math.floor(Math.log10(max/steps)));for(const m of [1,2,2.5,5,10]){if(m*s*steps>=max)return m*s}return 10*s};
-function frame(h,inner){return `<svg viewBox="0 0 ${W} ${h}" role="img">${inner}</svg>`}
-function yAxis(x0,x1,y0,y1,max,step,fmt,title){let o="";for(let v=0;v<=max+1e-9;v+=step){const y=y0-(v/max)*(y0-y1);o+=`<line class="ax" x1="${x0}" x2="${x1}" y1="${y}" y2="${y}"/><text class="m" x="${x0-6}" y="${y+4}" text-anchor="end" font-size="11">${fmt(v)}</text>`}
- return o+`<text class="m" font-size="11" transform="translate(12 ${(y0+y1)/2}) rotate(-90)" text-anchor="middle">${title}</text>`}
+"use strict";
+const D = __DATA__;
+const F = D.facts;
+const NS = "http://www.w3.org/2000/svg";
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-function c1(){const a=D.q1.filter(r=>r.part=="A_full_year");const x0=56,x1=W-10,y0=220,y1=20,max=40;
- let o=yAxis(x0,x1,y0,y1,max,10,v=>v,"Passengers (millions)");const bw=(x1-x0)/a.length;
- a.forEach((r,i)=>{const h=(r.passengers/1e6/max)*(y0-y1),x=x0+i*bw+bw*.15;
-  o+=`<rect x="${x}" y="${y0-h}" width="${bw*.7}" height="${h}" fill="${r.period=="2019"?"var(--grey)":"var(--blue)"}"/>`;
-  o+=`<text x="${x+bw*.35}" y="${y0-h-5}" text-anchor="middle" font-size="11">${r.period=="2019"?"base":(r.pct_vs_2019>0?"+":"")+f1(r.pct_vs_2019)+"%"}</text>`;
-  o+=`<text class="m" x="${x+bw*.35}" y="${y0+16}" text-anchor="middle" font-size="11">${r.period}</text>`});
- o+=`<text class="m" x="${(x0+x1)/2}" y="250" text-anchor="middle" font-size="11">Year (label = change vs 2019)</text>`;
- return frame(260,o)}
+/* ---------------------------------------------------------------- helpers */
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const el = (t, a, p) => { const e = document.createElementNS(NS, t);
+  for (const k in (a||{})) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const h = (t, a, p) => { const e = document.createElement(t);
+  for (const k in (a||{})) { if (k === "text") e.textContent = a[k];
+    else if (k === "html") e.innerHTML = a[k]; else e.setAttribute(k, a[k]); }
+  if (p) p.appendChild(e); return e; };
 
-function c2(){const x0=56,x1=W-10,y0=220,y1=20,max=140;let o=yAxis(x0,x1,y0,y1,max,20,v=>v,"Index (100 = average month)");
- const dx=(x1-x0)/11;
- D.months.forEach((m,i)=>o+=`<text class="m" x="${x0+i*dx}" y="${y0+16}" text-anchor="middle" font-size="10">${m}</text>`);
- const ly=v=>y0-(v/max)*(y0-y1);
- o+=`<line x1="${x0}" x2="${x1}" y1="${ly(100)}" y2="${ly(100)}" stroke="var(--text)" stroke-dasharray="3 3" opacity=".5"/>`;
- [[2019,"var(--grey)"],[2025,"var(--blue)"]].forEach(([y,c],k)=>{const rows=D.q2.filter(r=>r.year==y);
-  o+=`<polyline fill="none" stroke="${c}" stroke-width="2.5" points="${rows.map((r,i)=>(x0+i*dx)+","+ly(r.seasonal_index)).join(" ")}"/>`;
-  rows.forEach((r,i)=>o+=`<circle cx="${x0+i*dx}" cy="${ly(r.seasonal_index)}" r="3" fill="${c}"><title>${y} ${D.months[i]}: ${r.seasonal_index}</title></circle>`);
-  o+=`<rect x="${x0+10+k*70}" y="26" width="12" height="12" fill="${c}"/><text x="${x0+28+k*70}" y="37" font-size="12">${y}</text>`});
- o+=`<text class="m" x="${(x0+x1)/2}" y="250" text-anchor="middle" font-size="11">Month</text>`;return frame(260,o)}
+const nf = new Intl.NumberFormat("en-IE");
+const fmtInt = v => nf.format(Math.round(v));
+const fmtM = v => (v/1e6).toFixed(v >= 1e7 ? 1 : 2) + "m";
+const fmtPc = v => (v > 0 ? "+" : "") + v.toFixed(1) + "%";
+const monthLabel = s => MON[+s.slice(5,7) - 1] + " " + s.slice(0,4);
 
-function c3(){const rows=[...D.q3].sort((a,b)=>b.pct_since_2022-a.pct_since_2022);const x0=130,x1=W-40,top=10,rh=17;
- const mn=Math.min(0,...rows.map(r=>r.pct_since_2022)),mx=Math.max(...rows.map(r=>r.pct_since_2022));
- const sx=v=>x0+((v-mn)/(mx-mn))*(x1-x0);const h=top+rows.length*rh+40;let o="";
- rows.forEach((r,i)=>{const y=top+i*rh,v=r.pct_since_2022,xa=sx(Math.min(0,v)),xb=sx(Math.max(0,v));
-  o+=`<text x="${x0-80+ -0}" y="${y+12}" font-size="11" text-anchor="end" dx="76">${esc(r.market.replace(" (1)",""))}</text>`;
-  o+=`<rect x="${xa}" y="${y+2}" width="${Math.max(1,xb-xa)}" height="${rh-5}" fill="${v<0?"var(--red)":"var(--blue)"}"><title>${esc(r.market)}: ${v}%</title></rect>`;
-  o+=`<text class="m" x="${v<0?sx(0)+4:xb+4}" y="${y+12}" font-size="10" text-anchor="start">${(v>0?"+":"")+f1(v)}%</text>`});
- o+=`<line x1="${sx(0)}" x2="${sx(0)}" y1="${top}" y2="${top+rows.length*rh}" stroke="var(--text)" opacity=".5"/>`;
- o+=`<text class="m" x="${(x0+x1)/2}" y="${h-8}" text-anchor="middle" font-size="11">Change in passengers, 2025 vs 2022 (%)</text>`;return frame(h,o)}
+const scale = (d0, d1, r0, r1) => v => r0 + (v - d0) / (d1 - d0 || 1) * (r1 - r0);
+const nice = (max, n) => { const raw = max / n, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const s = [1,2,2.5,5,10].find(x => raw / p <= x) || 10; return s * p; };
 
-function c4(){const x0=56,x1=W-10,y0=220,y1=20,lo=70,hi=95,rows=D.q4;const n=rows.length-1;
- const ly=v=>y0-((v-lo)/(hi-lo))*(y0-y1),dx=(x1-x0)/n;let o="";
- for(let v=lo;v<=hi;v+=5)o+=`<line class="ax" x1="${x0}" x2="${x1}" y1="${ly(v)}" y2="${ly(v)}"/><text class="m" x="${x0-6}" y="${ly(v)+4}" text-anchor="end" font-size="11">${v}%</text>`;
- o+=`<text class="m" font-size="11" transform="translate(12 120) rotate(-90)" text-anchor="middle">Dublin share of five airports</text>`;
- rows.forEach((r,i)=>{if(i%4==0||i==n)o+=`<text class="m" x="${x0+i*dx}" y="${y0+16}" text-anchor="middle" font-size="10">${r.year}</text>`});
- o+=`<polyline fill="none" stroke="var(--blue)" stroke-width="2.5" points="${rows.map((r,i)=>(x0+i*dx)+","+ly(r.dublin_pct)).join(" ")}"/>`;
- rows.forEach((r,i)=>{if(i%4==0||i==n||r.year==2019||r.year==2021)o+=`<circle cx="${x0+i*dx}" cy="${ly(r.dublin_pct)}" r="3" fill="var(--blue)"><title>${r.year}: ${r.dublin_pct}%</title></circle><text x="${x0+i*dx}" y="${ly(r.dublin_pct)-8}" text-anchor="middle" font-size="10">${f1(r.dublin_pct)}</text>`});
- o+=`<text class="m" x="${(x0+x1)/2}" y="250" text-anchor="middle" font-size="11">Year (2020 and 2021 are pandemic years)</text>`;return frame(260,o)}
+function path(pts){ return pts.map((p,i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(""); }
 
-function c5(){const rows=D.q5.filter(r=>r.year==2025);const x0=120,x1=W-10,top=10,rh=26,max=40;
- const sx=v=>x0+(v/max)*(x1-x0-110);let o="";
- rows.forEach((r,i)=>{const y=top+i*rh;
-  o+=`<text x="${x0-8}" y="${y+16}" font-size="12" text-anchor="end">${esc(r.market.replace(" (1)",""))}</text>`;
-  o+=`<rect x="${x0}" y="${y+3}" width="${sx(r.share_pct)-x0}" height="${rh-8}" fill="var(--blue)"><title>${esc(r.market)}: ${r.share_pct}%</title></rect>`;
-  o+=`<text class="m" x="${sx(r.share_pct)+5}" y="${y+16}" font-size="11">${f1(r.share_pct)}% (cum. ${f1(r.cumulative_share_pct)}%)</text>`});
- const h=top+rows.length*rh+30;o+=`<text class="m" x="${(x0+x1)/2}" y="${h-8}" text-anchor="middle" font-size="11">Share of all Dublin passengers (%)</text>`;return frame(h,o)}
+/* a resize aware chart: fn(width) redraws into the host */
+const charts = [];
+function responsive(host, fn){
+  const draw = () => { const w = host.clientWidth; if (w > 0) { host.innerHTML = ""; fn(host, w); } };
+  charts.push(draw); draw();
+}
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => charts.forEach(f => f()), 160); });
 
-document.getElementById("kpis").innerHTML=D.summary.kpis.map(k=>`<div class="kpi"><b>${esc(k.value)}</b><span>${esc(k.label)}</span></div>`).join("");
-[[c1,"recovery"],[c2,"season"],[c3,"growth"],[c4,"share"],[c5,"concentration"]].forEach(([fn,key],i)=>{
- document.getElementById("c"+(i+1)).innerHTML=fn();document.getElementById("t"+(i+1)).textContent=D.summary.captions[key]});
+/* shared tooltip */
+function tipFor(host){
+  const t = h("div", {class:"tip"}, host);
+  return {
+    show(x, y, html){ t.innerHTML = html; t.style.left = x + "px"; t.style.top = y + "px"; t.style.opacity = 1; },
+    hide(){ t.style.opacity = 0; }
+  };
+}
+
+/* ---------------------------------------------------------------- sparklines */
+function spark(host, vals, colour){
+  const w = 200, ht = 34, pad = 2;
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const sx = scale(0, vals.length - 1, pad, w - pad), sy = scale(lo, hi, ht - pad, pad);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${ht}`, preserveAspectRatio:"none"}, host);
+  const pts = vals.map((v,i) => [sx(i), sy(v)]);
+  const gid = "sg" + Math.random().toString(36).slice(2,8);
+  const g = el("linearGradient", {id:gid, x1:0, y1:0, x2:0, y2:1}, el("defs", {}, svg));
+  el("stop", {offset:"0%", "stop-color":colour, "stop-opacity":.32}, g);
+  el("stop", {offset:"100%", "stop-color":colour, "stop-opacity":0}, g);
+  el("path", {d: path(pts) + `L${w-pad} ${ht} L${pad} ${ht}Z`, fill:`url(#${gid})`}, svg);
+  el("path", {d: path(pts), class:"serie", stroke:colour, "stroke-width":1.8,
+    "vector-effect":"non-scaling-stroke"}, svg);
+  const last = pts[pts.length - 1];
+  el("circle", {cx:last[0], cy:last[1], r:2.4, fill:colour}, svg);
+}
+
+/* ---------------------------------------------------------------- 01 annual */
+function annualChart(host, w){
+  const H = Math.max(300, Math.min(440, w * 0.46));
+  const m = {t:26, r:18, b:34, l:52};
+  const ys = D.annualYears, vs = D.annual;
+  const hi = Math.max(...vs) * 1.1;
+  const sx = scale(0, ys.length - 1, m.l, w - m.r), sy = scale(0, hi, H - m.b, m.t);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${H}`, role:"img",
+    "aria-label":"Annual passengers through Irish airports, 2005 to 2025"}, host);
+
+  const step = nice(hi, 4);
+  const ax = el("g", {class:"axis"}, svg);
+  for (let v = 0; v <= hi; v += step){
+    el("line", {class:"gridline", x1:m.l, x2:w - m.r, y1:sy(v), y2:sy(v)}, svg);
+    el("text", {x:m.l - 9, y:sy(v) + 4, "text-anchor":"end"}, ax).textContent = (v/1e6) + "m";
+  }
+  ys.forEach((y,i) => { if (y % 5 === 0 || i === ys.length - 1)
+    el("text", {x:sx(i), y:H - m.b + 19, "text-anchor":"middle"}, ax).textContent = y; });
+
+  const pts = vs.map((v,i) => [sx(i), sy(v)]);
+  const g = el("linearGradient", {id:"ag", x1:0, y1:0, x2:0, y2:1}, el("defs", {}, svg));
+  el("stop", {offset:"0%", "stop-color":css("--accent"), "stop-opacity":.30}, g);
+  el("stop", {offset:"100%", "stop-color":css("--accent"), "stop-opacity":.02}, g);
+  el("path", {d: path(pts) + `L${sx(ys.length-1)} ${sy(0)} L${sx(0)} ${sy(0)}Z`, fill:"url(#ag)"}, svg);
+  el("path", {d: path(pts), class:"serie", stroke:css("--accent"), "stroke-width":2.6}, svg);
+
+  /* annotations */
+  const mark = (year, text, dy, anchor) => {
+    const i = ys.indexOf(year); if (i < 0) return;
+    const gg = el("g", {class:"annot"}, svg);
+    el("line", {x1:sx(i), x2:sx(i), y1:sy(vs[i]) - 7, y2:m.t + dy + 6}, gg);
+    el("circle", {cx:sx(i), cy:sy(vs[i]), r:3.6, fill:css("--card"),
+      stroke:css("--accent"), "stroke-width":2}, gg);
+    const tx = el("text", {x:sx(i) + (anchor === "end" ? -7 : 7), y:m.t + dy,
+      "text-anchor":anchor}, gg);
+    tx.setAttribute("class","t"); tx.textContent = text;
+  };
+  mark(F.peakPreYear, "Pre crisis peak", 2, "start");
+  mark(F.troughYear, "Trough, " + fmtPc(F.troughDrop) + " from peak", 2, "start");
+  mark(2020, "Pandemic", 2, "end");
+  mark(2025, "Record", 2, "end");
+
+  /* hover */
+  const focus = el("g", {class:"focus", opacity:0}, svg);
+  const fl = el("line", {y1:m.t, y2:H - m.b}, focus);
+  const fc = el("circle", {r:5, fill:css("--accent")}, focus);
+  const tip = tipFor(host);
+  const hit = el("rect", {class:"hit", x:m.l, y:0, width:Math.max(1, w - m.l - m.r), height:H}, svg);
+  hit.addEventListener("pointermove", ev => {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * (w / r.width);
+    let i = Math.round((px - m.l) / ((w - m.r - m.l) / (ys.length - 1)));
+    i = Math.max(0, Math.min(ys.length - 1, i));
+    focus.setAttribute("opacity", 1);
+    fl.setAttribute("x1", sx(i)); fl.setAttribute("x2", sx(i));
+    fc.setAttribute("cx", sx(i)); fc.setAttribute("cy", sy(vs[i]));
+    const prev = i ? ((vs[i]/vs[i-1] - 1) * 100) : null;
+    tip.show(sx(i) * (r.width / w), sy(vs[i]) * (r.height / H),
+      `<div class="tt">${ys[i]}</div><div class="tv">${fmtInt(vs[i])}</div>` +
+      (prev === null ? "" : `<div class="tr"><span>vs ${ys[i-1]}</span><span>${fmtPc(prev)}</span></div>`));
+  });
+  hit.addEventListener("pointerleave", () => { focus.setAttribute("opacity", 0); tip.hide(); });
+}
+
+/* ---------------------------------------------------------------- 02 monthly */
+const AIR = [
+  {k:"All", label:"All airports", c:"--accent"},
+  {k:"Dublin", label:"Dublin", c:"--cool"},
+  {k:"Cork", label:"Cork", c:"--warm"},
+  {k:"Shannon", label:"Shannon", c:"--bad"},
+  {k:"Knock", label:"Knock", c:"--ink3"},
+  {k:"Kerry", label:"Kerry", c:"--accent2"}
+];
+let active = new Set(["All"]);
+
+function monthlyKeys(){
+  const host = document.getElementById("k-monthly"); host.innerHTML = "";
+  AIR.forEach(a => {
+    if (!D.monthly[a.k]) return;
+    const b = h("button", {class:"chip", type:"button",
+      "aria-pressed": active.has(a.k) ? "true" : "false"}, host);
+    const dot = h("span", {class:"dot"}, b); dot.style.background = css(a.c);
+    h("span", {text:a.label}, b);
+    b.addEventListener("click", () => {
+      if (active.has(a.k)) { if (active.size > 1) active.delete(a.k); }
+      else active.add(a.k);
+      monthlyKeys(); charts.forEach(f => f());
+    });
+  });
+}
+
+function monthlyChart(host, w){
+  const H = Math.max(290, Math.min(420, w * 0.42));
+  const m = {t:22, r:16, b:34, l:52};
+  const ms = D.months;
+  const shown = AIR.filter(a => active.has(a.k) && D.monthly[a.k]);
+  const hi = Math.max(...shown.flatMap(a => D.monthly[a.k].filter(v => v != null))) * 1.1;
+  const sx = scale(0, ms.length - 1, m.l, w - m.r), sy = scale(0, hi, H - m.b, m.t);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${H}`, role:"img",
+    "aria-label":"Monthly passengers since January 2019"}, host);
+
+  /* pandemic band */
+  const i0 = ms.indexOf("2020-03"), i1 = ms.indexOf("2021-12");
+  if (i0 >= 0 && i1 >= 0){
+    el("rect", {x:sx(i0), y:m.t, width:sx(i1) - sx(i0), height:H - m.b - m.t,
+      fill:css("--ink3"), opacity:.07}, svg);
+    const lb = el("text", {x:(sx(i0) + sx(i1)) / 2, y:m.t + 13, "text-anchor":"middle",
+      class:"t"}, el("g", {class:"annot"}, svg));
+    lb.textContent = "Travel restrictions";
+  }
+
+  const step = nice(hi, 4);
+  const ax = el("g", {class:"axis"}, svg);
+  for (let v = 0; v <= hi; v += step){
+    el("line", {class:"gridline", x1:m.l, x2:w - m.r, y1:sy(v), y2:sy(v)}, svg);
+    el("text", {x:m.l - 9, y:sy(v) + 4, "text-anchor":"end"}, ax).textContent =
+      v >= 1e6 ? (v/1e6) + "m" : (v/1e3) + "k";
+  }
+  ms.forEach((s,i) => { if (s.endsWith("-01"))
+    el("text", {x:sx(i), y:H - m.b + 19, "text-anchor":"middle"}, ax).textContent = s.slice(0,4); });
+
+  shown.forEach(a => {
+    const vals = D.monthly[a.k];
+    const pts = vals.map((v,i) => v == null ? null : [sx(i), sy(v)]).filter(Boolean);
+    el("path", {d: path(pts), class:"serie", stroke:css(a.c),
+      "stroke-width": a.k === "All" ? 2.4 : 1.8, opacity: a.k === "All" ? 1 : .92}, svg);
+  });
+
+  const focus = el("g", {class:"focus", opacity:0}, svg);
+  const fl = el("line", {y1:m.t, y2:H - m.b}, focus);
+  const dots = shown.map(a => el("circle", {r:4, fill:css(a.c)}, focus));
+  const tip = tipFor(host);
+  const hit = el("rect", {class:"hit", x:m.l, y:0, width:Math.max(1, w - m.l - m.r), height:H}, svg);
+  hit.addEventListener("pointermove", ev => {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * (w / r.width);
+    let i = Math.round((px - m.l) / ((w - m.r - m.l) / (ms.length - 1)));
+    i = Math.max(0, Math.min(ms.length - 1, i));
+    focus.setAttribute("opacity", 1);
+    fl.setAttribute("x1", sx(i)); fl.setAttribute("x2", sx(i));
+    let rowsHtml = "", top = H;
+    shown.forEach((a,j) => {
+      const v = D.monthly[a.k][i];
+      if (v == null){ dots[j].setAttribute("opacity", 0); return; }
+      dots[j].setAttribute("opacity", 1);
+      dots[j].setAttribute("cx", sx(i)); dots[j].setAttribute("cy", sy(v));
+      top = Math.min(top, sy(v));
+      rowsHtml += `<div class="tr"><span><i class="sw" style="background:${css(a.c)}"></i>${a.label}</span><span>${fmtInt(v)}</span></div>`;
+    });
+    tip.show(sx(i) * (r.width / w), top * (r.height / H),
+      `<div class="tt">${monthLabel(ms[i])}</div>${rowsHtml}`);
+  });
+  hit.addEventListener("pointerleave", () => { focus.setAttribute("opacity", 0); tip.hide(); });
+}
+
+/* ---------------------------------------------------------------- 03 heatmap */
+function heatChart(host, w){
+  const ms = D.months, vals = D.monthly.All;
+  const years = [...new Set(ms.map(s => +s.slice(0,4)))];
+  const W = Math.max(560, w), cell = {w:(W - 58) / 12, h:34};
+  const H = years.length * cell.h + 34;
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, role:"img",
+    "aria-label":"Monthly passengers by year and month"}, host);
+  const hi = Math.max(...vals), lo = Math.min(...vals);
+  const tip = tipFor(host);
+
+  const colour = v => {
+    const t = Math.pow((v - lo) / (hi - lo), 0.62);
+    return `color-mix(in oklab, ${css("--accent")} ${(8 + t * 92).toFixed(1)}%, ${css("--bg2")})`;
+  };
+
+  const ax = el("g", {class:"axis"}, svg);
+  MON.forEach((mn,i) => el("text", {x:58 + cell.w * (i + .5), y:18, "text-anchor":"middle"}, ax)
+    .textContent = mn);
+  years.forEach((y,r) => {
+    el("text", {x:46, y:34 + r * cell.h + cell.h/2 + 4, "text-anchor":"end", class:"strong"}, ax)
+      .textContent = y;
+    for (let c = 0; c < 12; c++){
+      const key = y + "-" + String(c+1).padStart(2,"0");
+      const i = ms.indexOf(key);
+      const x = 58 + c * cell.w, yy = 34 + r * cell.h;
+      if (i < 0){
+        el("rect", {x:x+1.5, y:yy+1.5, width:cell.w-3, height:cell.h-3, rx:4,
+          fill:"none", stroke:css("--line2"), "stroke-dasharray":"3 3"}, svg);
+        continue;
+      }
+      const v = vals[i];
+      const rect = el("rect", {x:x+1.5, y:yy+1.5, width:cell.w-3, height:cell.h-3, rx:4,
+        fill:colour(v), style:"cursor:crosshair"}, svg);
+      rect.addEventListener("pointerenter", () => {
+        const rb = svg.getBoundingClientRect();
+        const prev = ms.indexOf((y-1) + "-" + String(c+1).padStart(2,"0"));
+        const yoy = prev >= 0 ? ((v/vals[prev] - 1) * 100) : null;
+        tip.show((x + cell.w/2) * (rb.width / W), yy * (rb.height / H),
+          `<div class="tt">${MON[c]} ${y}</div><div class="tv">${fmtInt(v)}</div>` +
+          (yoy === null ? "" : `<div class="tr"><span>vs ${y-1}</span><span>${fmtPc(yoy)}</span></div>`));
+      });
+      rect.addEventListener("pointerleave", () => tip.hide());
+    }
+  });
+
+  document.getElementById("ramp").style.background =
+    `linear-gradient(90deg, color-mix(in oklab, ${css("--accent")} 8%, ${css("--bg2")}), ${css("--accent")})`;
+}
+
+/* ---------------------------------------------------------------- 04 markets */
+let marketView = "share", marketQuery = "";
+function marketRows(){
+  const host = document.getElementById("c-market"); host.innerHTML = "";
+  let list = D.markets.filter(m => m.name.toLowerCase().includes(marketQuery));
+  if (marketView === "growth") list = list.filter(m => m.growth != null && m.p25 > 200);
+  list = list.slice(0, 20);
+  if (!list.length){ h("p", {text:"No market matches that filter.",
+    style:"color:var(--ink3);font-size:14px"}, host); return; }
+  const key = marketView === "share" ? "share" : "growth";
+  const max = Math.max(...list.map(m => Math.abs(m[key])));
+  list.forEach((m, i) => {
+    const row = h("div", {class:"row" + (m[key] < 0 ? " neg" : "")}, host);
+    h("div", {class:"nm", text:m.name}, row);
+    const track = h("div", {class:"track"}, row);
+    const fill = h("div", {class:"fill"}, track);
+    const vl = h("div", {class:"vl"}, row);
+    vl.innerHTML = marketView === "share"
+      ? `${m.share.toFixed(1)}% <i>${fmtInt(m.p25 * 1000)}</i>`
+      : `${fmtPc(m.growth)}`;
+    requestAnimationFrame(() => { fill.style.width = (Math.abs(m[key]) / max * 100).toFixed(1) + "%"; });
+    row.title = `${m.name}: ${fmtInt(m.p25*1000)} passengers in 2025` +
+      (m.growth != null ? `, ${fmtPc(m.growth)} since 2022` : "");
+  });
+}
+
+/* ---------------------------------------------------------------- 05 pareto */
+function paretoChart(host, w){
+  const H = Math.max(290, Math.min(400, w * 0.40));
+  const m = {t:24, r:46, b:48, l:46};
+  const list = D.markets.slice(0, w < 560 ? 10 : 20);
+  const bw = (w - m.l - m.r) / list.length;
+  const hiBar = Math.max(...list.map(d => d.share));
+  const sy = scale(0, hiBar * 1.12, H - m.b, m.t), sy2 = scale(0, 100, H - m.b, m.t);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${H}`, role:"img",
+    "aria-label":"Market share and cumulative share, top 20 markets"}, host);
+
+  const ax = el("g", {class:"axis"}, svg);
+  for (let v = 0; v <= 100; v += 25){
+    el("line", {class:"gridline", x1:m.l, x2:w - m.r, y1:sy2(v), y2:sy2(v)}, svg);
+    el("text", {x:w - m.r + 8, y:sy2(v) + 4}, ax).textContent = v + "%";
+  }
+  const tip = tipFor(host);
+  list.forEach((d,i) => {
+    const x = m.l + i * bw;
+    const bar = el("rect", {x:x + bw*.16, y:sy(d.share), width:bw*.68,
+      height:Math.max(1, sy(0) - sy(d.share)), rx:3, fill:css("--accent"), opacity:.82,
+      style:"cursor:crosshair"}, svg);
+    bar.addEventListener("pointerenter", () => {
+      const rb = svg.getBoundingClientRect();
+      tip.show((x + bw/2) * (rb.width / w), sy(d.share) * (rb.height / H),
+        `<div class="tt">${i+1}. ${d.name}</div>` +
+        `<div class="tr"><span>Share</span><span>${d.share.toFixed(2)}%</span></div>` +
+        `<div class="tr"><span>Running total</span><span>${d.cum.toFixed(1)}%</span></div>`);
+    });
+    bar.addEventListener("pointerleave", () => tip.hide());
+    if (i % 2 === 0 || bw > 42){
+      const t = el("text", {x:x + bw/2, y:H - m.b + 16, "text-anchor":"end",
+        transform:`rotate(-38 ${x + bw/2} ${H - m.b + 16})`}, ax);
+      t.textContent = d.name.replace(" (1)","").replace(" (domestic)"," dom.");
+    }
+  });
+  const pts = list.map((d,i) => [m.l + i*bw + bw/2, sy2(d.cum)]);
+  el("path", {d: path(pts), class:"serie", stroke:css("--warm"), "stroke-width":2.4}, svg);
+  pts.forEach(p => el("circle", {cx:p[0], cy:p[1], r:3, fill:css("--warm")}, svg));
+  if (pts.length >= 10){
+    const i = Math.min(9, pts.length - 1);
+    const lbl = el("text", {x:Math.min(pts[i][0], w - m.r - 54), y:pts[i][1] - 14,
+      "text-anchor":"middle", class:"t"}, el("g", {class:"annot"}, svg));
+    lbl.textContent = "Top 10 = " + F.top10.toFixed(1) + "%";
+  }
+}
+
+/* ---------------------------------------------------------------- 06 airports */
+function airportCards(){
+  const host = document.getElementById("c-airports"); host.innerHTML = "";
+  D.airports.forEach(a => {
+    const card = h("div", {class:"sm"}, host);
+    const nm = h("div", {class:"nm"}, card);
+    h("span", {text:a.name}, nm);
+    h("span", {class:"d up", text:fmtPc(a.delta)}, nm);
+    h("div", {class:"sub", text:fmtInt(a.y2025) + " in 2025, against 2019"}, card);
+    const box = h("div", {class:"chart"}, card);
+    const vals = a.series.filter(v => v != null);
+    const w = 220, H = 52, lo = 0, hi = Math.max(...vals);
+    const sx = scale(0, vals.length - 1, 1, w - 1), sy = scale(lo, hi, H - 2, 4);
+    const svg = el("svg", {viewBox:`0 0 ${w} ${H}`, preserveAspectRatio:"none"}, box);
+    const pts = vals.map((v,i) => [sx(i), sy(v)]);
+    const gid = "ag" + a.name;
+    const g = el("linearGradient", {id:gid, x1:0, y1:0, x2:0, y2:1}, el("defs", {}, svg));
+    el("stop", {offset:"0%", "stop-color":css("--accent"), "stop-opacity":.3}, g);
+    el("stop", {offset:"100%", "stop-color":css("--accent"), "stop-opacity":0}, g);
+    el("path", {d: path(pts) + `L${w-1} ${H} L1 ${H}Z`, fill:`url(#${gid})`}, svg);
+    el("path", {d: path(pts), class:"serie", stroke:css("--accent"), "stroke-width":1.8,
+      "vector-effect":"non-scaling-stroke"}, svg);
+    const i19 = D.annualYears.indexOf(2019);
+    el("circle", {cx:sx(i19), cy:sy(vals[i19]), r:2.6, fill:css("--warm")}, svg);
+  });
+}
+
+/* ---------------------------------------------------------------- 07 operations */
+function opsChart(host, w){
+  const H = Math.max(260, Math.min(340, w * 0.52));
+  const m = {t:22, r:52, b:32, l:38};
+  const ops = D.ops, base = ops[0];
+  const series = [
+    {k:"pax", label:"Passengers", c:"--accent"},
+    {k:"flights", label:"Flights", c:"--cool"},
+    {k:"freight", label:"Freight tonnes", c:"--warm"}
+  ];
+  const idx = s => ops.map(o => o[s.k] / base[s.k] * 100);
+  const hi = Math.max(...series.flatMap(idx)) * 1.08;
+  const sx = scale(0, ops.length - 1, m.l, w - m.r), sy = scale(0, hi, H - m.b, m.t);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${H}`, role:"img",
+    "aria-label":"Passengers, flights and freight indexed to 2020"}, host);
+  const ax = el("g", {class:"axis"}, svg);
+  const step = nice(hi, 4);
+  for (let v = 0; v <= hi; v += step){
+    el("line", {class:"gridline", x1:m.l, x2:w - m.r, y1:sy(v), y2:sy(v)}, svg);
+    el("text", {x:m.l - 8, y:sy(v) + 4, "text-anchor":"end"}, ax).textContent = v;
+  }
+  ops.forEach((o,i) => el("text", {x:sx(i), y:H - m.b + 18, "text-anchor":"middle"}, ax)
+    .textContent = o.year);
+  series.forEach(s => {
+    const v = idx(s), pts = v.map((x,i) => [sx(i), sy(x)]);
+    el("path", {d: path(pts), class:"serie", stroke:css(s.c), "stroke-width":2.4}, svg);
+    pts.forEach(p => el("circle", {cx:p[0], cy:p[1], r:3, fill:css(s.c)}, svg));
+    const t = el("text", {x:w - m.r + 7, y:pts[pts.length-1][1] + 4, class:"t"},
+      el("g", {class:"annot"}, svg));
+    t.textContent = Math.round(v[v.length-1]);
+    t.setAttribute("fill", css(s.c));
+  });
+  const lg = el("g", {class:"axis"}, svg);
+  const gap = Math.min(118, (w - m.l - m.r) / series.length);
+  series.forEach((s,i) => {
+    el("rect", {x:m.l + i*gap, y:m.t - 16, width:9, height:9, rx:2, fill:css(s.c)}, lg);
+    const t = el("text", {x:m.l + i*gap + 14, y:m.t - 8}, lg);
+    t.textContent = gap < 90 ? s.label.split(" ")[0] : s.label;
+  });
+}
+
+function ppfChart(host, w){
+  const H = Math.max(240, Math.min(340, w * 0.72));
+  const m = {t:40, r:18, b:32, l:40};
+  const ops = D.ops;
+  const vals = ops.map(o => o.ppf);
+  const hi = Math.max(...vals) * 1.15;
+  const sx = scale(0, ops.length - 1, m.l, w - m.r), sy = scale(0, hi, H - m.b, m.t);
+  const svg = el("svg", {viewBox:`0 0 ${w} ${H}`, role:"img",
+    "aria-label":"Passengers per flight, 2020 to 2025"}, host);
+  const ttl = el("text", {x:m.l - 4, y:22, class:"t"}, el("g", {class:"annot"}, svg));
+  ttl.textContent = "Passengers per flight";
+  const bw = (w - m.l - m.r) / ops.length;
+  const ax = el("g", {class:"axis"}, svg);
+  ops.forEach((o,i) => {
+    const x = m.l + i * bw;
+    el("rect", {x:x + bw*.2, y:sy(o.ppf), width:bw*.6, height:sy(0) - sy(o.ppf), rx:3,
+      fill: i === ops.length - 1 ? css("--accent") : css("--accent"), opacity: i === ops.length-1 ? 1 : .42}, svg);
+    el("text", {x:x + bw/2, y:sy(o.ppf) - 7, "text-anchor":"middle", class:"strong"}, ax)
+      .textContent = Math.round(o.ppf);
+    el("text", {x:x + bw/2, y:H - m.b + 18, "text-anchor":"middle"}, ax).textContent = o.year;
+  });
+}
+
+/* ---------------------------------------------------------------- kpis + copy */
+function kpis(){
+  const host = document.getElementById("kpis");
+  const cards = [
+    {label:"Passengers in 2025", value:fmtM(F.y2025).replace("m",""), unit:"million",
+     note:`An all time record, ${fmtPc(F.vsPeakPre)} on the ${F.peakPreYear} peak.`,
+     spark:D.annual, colour:"--accent"},
+    {label:"Against 2019", value:fmtPc(F.vs2019), unit:"",
+     note:`And still climbing: the first half of 2026 is ${fmtPc(F.h1Growth)} on the same months of 2025.`,
+     spark:D.annual.slice(-8), colour:"--accent"},
+    {label:"Passengers, April 2020", value:fmtInt(F.floorValue), unit:"",
+     note:`The floor, across every airport in the State. ${fmtPc(F.floorDrop)} against the same month a year earlier.`,
+     spark:D.monthly.All, colour:"--bad"},
+    {label:"Passengers per flight", value:String(Math.round(F.ppfLast)), unit:"in 2025",
+     note:`Up from ${Math.round(F.ppfFirst)} in 2020, a gain of ${fmtPc(F.ppfGain).replace("+","")}.`,
+     spark:D.ops.map(o => o.ppf), colour:"--cool"}
+  ];
+  cards.forEach(c => {
+    const card = h("div", {class:"kpi"}, host);
+    h("div", {class:"label", text:c.label}, card);
+    const v = h("div", {class:"value"}, card);
+    v.textContent = c.value;
+    if (c.unit) { const s = document.createElement("small"); s.textContent = " " + c.unit; v.appendChild(s); }
+    h("div", {class:"note", text:c.note}, card);
+    const box = h("div", {}, card);
+    responsive(box, (hostEl) => spark(hostEl, c.spark, css(c.colour)));
+  });
+}
+
+function copy(){
+  document.getElementById("built").textContent = "Data to " + monthLabel(F.lastMonth);
+
+  document.getElementById("t-annual").innerHTML =
+    `The <b>${F.peakPreYear}</b> peak took <b>${F.regainedAfter} years</b> to beat: traffic fell ` +
+    `${fmtPc(F.troughDrop)} to its trough in ${F.troughYear} and only passed the old high again in ` +
+    `<b>${F.regainedYear}</b>. The pandemic was far deeper, ${fmtPc(F.covidDrop)} in a single year, ` +
+    `and far shorter. By 2023 traffic was already above 2019, and 2025 closed ` +
+    `${fmtPc(F.vsPeakPre)} above the pre crisis record.`;
+
+  document.getElementById("t-monthly").innerHTML =
+    `The busiest month on record is <b>${monthLabel(F.peakMonth)}</b> with ${fmtInt(F.peakValue)} ` +
+    `passengers. The quietest is <b>${monthLabel(F.floorMonth)}</b> with ${fmtInt(F.floorValue)}, ` +
+    `a drop of ${fmtPc(F.floorDrop)} on the same month a year before. Those two months are ` +
+    `${(F.peakValue / F.floorValue).toFixed(0)} times apart.`;
+
+  const summer = (() => {
+    const v = D.monthly.All, ms = D.months;
+    const aug = ms.indexOf("2025-08"), feb = ms.indexOf("2025-02");
+    return (v[aug] / v[feb]).toFixed(2);
+  })();
+  document.getElementById("t-heat").innerHTML =
+    `Irish traffic is strongly seasonal and always has been: August 2025 carried <b>${summer} times</b> ` +
+    `the passengers of February 2025. The grid also shows how abrupt the stop was. February 2020 was ` +
+    `still a normal month, March 2020 fell to ${F.mar2020}% of the March before it, and April 2020 is ` +
+    `almost empty. The pattern does not look ordinary again until the summer of 2022.`;
+
+  const gone = F.gone.length > 1
+    ? F.gone.slice(0,-1).join(", ") + " and " + F.gone[F.gone.length-1]
+    : F.gone.join("");
+  document.getElementById("t-market").innerHTML =
+    `<b>${F.topMarket}</b> alone is ${F.topShare.toFixed(1)}% of all country traffic, more than the ` +
+    `next three markets together. Of the ${F.bothYears} markets with figures in both years, ` +
+    `<b>${F.grewCount} grew</b> since 2022. Among the markets above ${fmtInt(F.moverFloor*1000)} ` +
+    `passengers in both years the fastest is <b>${F.fastest}</b> at ${fmtPc(F.fastestGrowth)} and the ` +
+    `slowest is <b>${F.slowest}</b> at ${fmtPc(F.slowestGrowth)}: sun routes are pulling away while ` +
+    `the eastern European routes that grew with migration have flattened. ` +
+    (gone ? `${F.gone.length === 1 ? "One market" : F.gone.length + " markets"} disappeared outright: ` +
+       `<b>${gone}</b> carried passengers until 2022 and nothing since, ` +
+       `which is airspace closing rather than demand falling.` : "");
+
+  document.getElementById("t-pareto").innerHTML =
+    `${F.countries} countries appear in the 2025 data, but the top ten carry <b>${F.top10.toFixed(1)}%</b> ` +
+    `of the passengers. A route network this concentrated is efficient and exposed at the same time: ` +
+    `most of the risk sits in a handful of markets.`;
+
+  const best = D.airports.reduce((a,b) => a.delta > b.delta ? a : b);
+  const dub = D.airports.find(a => a.name === "Dublin");
+  document.getElementById("t-airports").innerHTML =
+    `Dublin carries most of the traffic, but it is not the fastest growing. Dublin is ` +
+    `${fmtPc(dub.delta)} on 2019 while <b>${best.name}</b> is ${fmtPc(best.delta)}, the strongest ` +
+    `recovery in the country. Every one of the six is now above its 2019 level, which the national ` +
+    `total alone would not have told you.`;
+
+  const o0 = D.ops[0], o1 = D.ops[D.ops.length-1];
+  document.getElementById("t-ops").innerHTML =
+    `Passengers grew far faster than flights, so the aircraft are fuller or larger: ` +
+    `<b>${Math.round(o0.ppf)} passengers per flight in ${o0.year}, ${Math.round(o1.ppf)} in ${o1.year}</b>, ` +
+    `a gain of ${fmtPc(F.ppfGain).replace("+","")}. Freight followed its own path, ` +
+    `${fmtPc(F.freightGain)} across the same years, because most of it rides in the hold of ` +
+    `passenger flights that were not flying.`;
+}
+
+/* ---------------------------------------------------------------- theme */
+(function theme(){
+  const btn = document.getElementById("theme");
+  let saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+  btn.addEventListener("click", () => {
+    const now = document.documentElement.getAttribute("data-theme");
+    const dark = now ? now === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+    charts.forEach(f => f()); marketRows(); airportCards();
+  });
+})();
+
+/* ---------------------------------------------------------------- boot */
+kpis();
+copy();
+monthlyKeys();
+responsive(document.getElementById("c-annual"), annualChart);
+responsive(document.getElementById("c-monthly"), monthlyChart);
+responsive(document.getElementById("c-heat"), heatChart);
+responsive(document.getElementById("c-pareto"), paretoChart);
+responsive(document.getElementById("c-ops"), opsChart);
+responsive(document.getElementById("c-ppf"), ppfChart);
+airportCards();
+marketRows();
+
+document.querySelectorAll("#k-market button").forEach(b => {
+  b.addEventListener("click", () => {
+    marketView = b.dataset.v;
+    document.querySelectorAll("#k-market button").forEach(x =>
+      x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    marketRows();
+  });
+});
+document.getElementById("q-market").addEventListener("input", e => {
+  marketQuery = e.target.value.trim().toLowerCase();
+  marketRows();
+});
 </script>
 </body>
 </html>

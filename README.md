@@ -1,84 +1,110 @@
-# Irish Aviation: Dublin Airport in Numbers
+# Twenty one years of Irish aviation
 
-A small analyst project on real public data. It asks five business questions about
-Dublin Airport and answers each with a SQL query, a chart and a plain conclusion.
+Every passenger through every Irish airport since 2005, taken from Central Statistics
+Office open data, loaded into SQLite and turned into one interactive page.
+
+**[Open the dashboard](https://pedrogaspar-ds.github.io/irish-aviation/)**
 
 ![Dashboard](docs/dashboard.png)
 
-Live: [pedrogaspar-ds.github.io/irish-aviation](https://pedrogaspar-ds.github.io/irish-aviation/)
+The page has no external requests of any kind: no CDN, no fonts, no analytics, no chart
+library. Every chart is SVG written by hand from the data. You can also just double click
+`dashboard.html` with no internet at all.
 
-Or open `dashboard.html` in any browser (double click, no internet needed).
+## The questions
 
-## The question
+How has Irish air traffic actually moved over two decades, how did the two collapses in
+the series differ, how seasonal is the traffic, where does Ireland fly, how much of it sits
+in a handful of markets, and is anything changing in how that traffic is carried? These are
+the questions a capacity planning or commercial team asks before it plans anything.
 
-Is Dublin Airport growing past its pre-pandemic level, how seasonal is it, which
-markets drive the growth, and how much risk sits in one hub and a few markets?
-These are the questions a capacity planning or commercial data team asks.
+## What the data says
+
+1. **The 2007 peak took nine years to beat. The pandemic took three.** Traffic fell 24.5%
+   from the 2007 peak to its trough in 2010 and only passed the old high again in 2016. The
+   pandemic was far deeper, 78.2% in a single year, and far shorter: 2023 was already above
+   2019.
+2. **2025 is an all time record**, 43.5 million passengers, 14.2% above 2019 and 39.7% above
+   the pre crisis peak. January to June 2026 is 5.7% above the same months of 2025, so it is
+   still climbing.
+3. **April 2020 carried 25,286 passengers** through every airport in the State together,
+   99.2% below the April before it. The busiest month on record, August 2025, is 181 times
+   larger.
+4. **The traffic is strongly seasonal and the winter gap is not closing.** August 2025
+   carried 1.80 times the passengers of February 2025.
+5. **The United Kingdom alone is 31.7% of country traffic**, more than the next three
+   markets together, and the top ten markets carry 83.0% of it. Of the 38 markets with
+   figures in both years, 37 grew since 2022. Türkiye grew fastest at +73.2%, while the
+   eastern European routes that grew with migration have flattened: Lithuania is +1.2%.
+   Russia carried passengers until 2022 and nothing since.
+6. **Dublin is not the fastest growing airport.** Dublin is 11.4% above 2019, but Shannon is
+   38.6% above it and Cork 33.9%. All six airports are now above their 2019 level, which the
+   national total alone would hide. Dublin's share of national traffic peaked at 85.7% in
+   2019 and is 83.6% in 2025.
+7. **The aircraft are fuller or larger.** Passengers per flight went from 87 in 2020 to 147
+   in 2025, a gain of 69.3%, because passengers grew far faster than flight movements.
+   Freight followed its own path, up 49.8% across the same years, because most of it rides
+   in the hold of passenger flights that were not flying.
+
+Every one of those figures is produced by a query over the database. None is typed by hand.
 
 ## Data
 
-Central Statistics Office (CSO) Ireland, Aviation Statistics, through the public
-PxStat API: tables TAA05 (annual passengers by airport), TAM08 (monthly passengers by
-airport, to June 2026) and TAA06 (annual passengers by destination country, 2020 to 2025).
-Exact URLs, download date and licence notes are in [data/SOURCES.md](data/SOURCES.md).
-Source site: https://data.cso.ie
+Central Statistics Office Ireland, Aviation Statistics, through the public PxStat API:
+
+| Table | What it gives | Coverage |
+|---|---|---|
+| TAA05 | annual passengers by airport | 2005 to 2025, 9 airports |
+| TAM08 | monthly passengers by airport | Jan 2019 to Jun 2026 |
+| TAA06 | passengers, freight and flights by market | 2020 to 2025, 59 markets |
+
+Raw JSON-stat responses are stored exactly as received in `data/raw/`. Exact URLs, download
+date and licence notes are in [data/SOURCES.md](data/SOURCES.md). Source site:
+https://data.cso.ie
 
 ## How it is built
 
 ```
-src/fetch.py      download raw JSON-stat from the CSO API into data/raw/
-src/build_db.py   load into SQLite (data/aviation.db): 2 dimension tables, 3 fact tables
-sql/              one SQL file per business question (q1 to q5)
-src/analyse.py    run the queries, write figs/*.png and build dashboard.html
+src/fetch.py            download raw JSON-stat from the CSO API into data/raw/
+src/build_db.py         load into SQLite: 2 dimension tables, 3 fact tables
+src/build_dashboard.py  query the database and write dashboard.html
+src/analyse.py          the five original SQL questions, PNG charts and results.json
+sql/                    one SQL file per question (q1 to q5)
 ```
 
 Schema: `dim_airport`, `dim_market`, `fact_airport_year`, `fact_airport_month`,
-`fact_market_year`, with primary keys, foreign keys and check constraints.
-
-## Findings
-
-1. **Recovery.** Dublin handled 36.4 million passengers in 2025, 11.4% above 2019
-   (32.7 million). It passed 2019 in 2023 (+1.8%). January to June 2026 was 17.9 million,
-   16.2% above the same months of 2019 and 5.8% above 2025.
-2. **Seasonality.** In 2025 August (3.78 million) had 1.77 times the traffic of February
-   (2.14 million). In 2019 the gap was 1.72 times (July vs February). The winter dip is
-   not closing.
-3. **Markets.** Between 2022 and 2025, 26 of 28 country markets grew. Turkiye grew fastest
-   (+69.8%). The UK added the most passengers (+2.35 million) and the US added 1.06 million.
-   Only Lithuania (-8.9%) and Bulgaria (-7.0%) shrank.
-4. **Dublin's weight.** Dublin had 83.7% of passengers at the five main Irish airports in
-   2025, down from 85.9% in 2019 but up from 72.8% in 2005. Cork rose from 6.8% to 8.0% and
-   Shannon from 4.2% to 5.2% since 2019.
-5. **Concentration.** The top 10 country markets carried 79.0% of Dublin passengers in 2025
-   (80.9% in 2022). The UK alone is 27.8%, so one market is more than a quarter of traffic.
-
-All numbers come from the queries in `sql/` and are printed by `src/analyse.py`
-(also saved in `data/results.json`).
-
-## Limitations
-
-- The public tables give passengers by destination **country**, not by route or airline,
-  so the question about route concentration is answered at country level.
-- 2022 is still a recovery year, so growth since 2022 partly reflects recovery. The
-  2025 vs 2024 column in the Q3 output shows current momentum instead.
-- Transit passengers are counted twice in the country table. The Canary Islands are a
-  separate market from Spain in the CSO data. Figures are subject to revision.
-- Cork was closed in October 2021, which explains its dip in the 2021 share.
-- This is descriptive analysis. It does not forecast, and it has no airline or capacity
-  (seats, runway) data.
+`fact_market_year`, with primary keys, foreign keys and check constraints, so a bad
+direction or flight type cannot enter the database in the first place.
 
 ## How to run
 
 ```
 pip install -r requirements.txt
-python3 src/fetch.py       # optional, raw data is already in the repo
+python3 src/fetch.py              # optional, the raw data is already in the repo
 python3 src/build_db.py
-python3 src/analyse.py
+python3 src/build_dashboard.py    # writes dashboard.html
+python3 src/analyse.py            # optional, writes figs/*.png and data/results.json
 ```
 
-Python 3.10 or newer. SQLite is part of the standard library. To run a single query:
+Python 3.10 or newer. SQLite is in the standard library, and only `src/analyse.py` needs
+matplotlib. To run a single query by hand:
 `sqlite3 -header -column data/aviation.db < sql/q1_recovery_vs_2019.sql`
+
+## Limitations
+
+- 2026 covers January to June only.
+- The public tables give passengers by destination **country**, not by route or airline, so
+  concentration is measured at country level.
+- Market detail starts in 2020, so no market comparison can reach back to 2019, and growth
+  measured from 2020 or 2022 partly reflects recovery rather than new demand.
+- Passengers per flight divides all passengers by all flight movements, including flights
+  that carried only freight.
+- Transit passengers are counted twice in the market table. The Canary Islands are a
+  separate market from Spain in the CSO data. Figures are subject to revision.
+- Cork was closed for runway works in October 2021, which is visible in its 2021 figures.
+- This is descriptive analysis. It does not forecast, and it has no airline, seat or
+  runway capacity data.
 
 ## Licence
 
-Code: MIT. Data: CSO Ireland, see `data/SOURCES.md`.
+Code: MIT. Data: CSO Ireland, reused under CC BY 4.0, see `data/SOURCES.md`.

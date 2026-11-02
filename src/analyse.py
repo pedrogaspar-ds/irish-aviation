@@ -1,4 +1,4 @@
-"""Run the five SQL questions, draw the PNG charts and build dashboard.html."""
+"""Run the five SQL questions, draw the PNG charts and write data/results.json."""
 import json
 import sqlite3
 from pathlib import Path
@@ -173,9 +173,7 @@ def main():
     data = {"summary": summary, "q1": q1, "q2": q2, "q3": q3, "q4": q4, "q5": q5,
             "months": MONTHS}
     (ROOT / "data" / "results.json").write_text(json.dumps(data, indent=1))
-    tpl = (ROOT / "src" / "dashboard_template.html").read_text()
-    (ROOT / "dashboard.html").write_text(
-        tpl.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":"))))
+    # dashboard.html is built separately by src/build_dashboard.py
     print(json.dumps(summary["kpis"], indent=1))
     for k, v in summary["captions"].items():
         print(k, ":", v)
