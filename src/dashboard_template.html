@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Irish Aviation Dashboard</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1b2430;--muted:#5d6775;--line:#d9dde3;--blue:#1f5fa8;--orange:#d9822b;--grey:#8a8f98;--red:#b23b3b}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b222b;--text:#e8ecf1;--muted:#a3adba;--line:#34404e;--blue:#5aa0ee;--orange:#f0a050;--grey:#8f98a5;--red:#e07070}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:960px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.6rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px;font-size:.95rem}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.kpi b{display:block;font-size:2rem;line-height:1.1;color:var(--blue)}
+.kpi span{color:var(--muted);font-size:.85rem}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:16px}
+h2{font-size:1.05rem;margin:0 0 8px}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--text);font-family:inherit}
+svg .m{fill:var(--muted)}
+svg .ax{stroke:var(--line);stroke-width:1}
+p.cap{margin:8px 0 0;color:var(--muted);font-size:.92rem}
+footer{color:var(--muted);font-size:.85rem;margin-top:8px}
+a{color:var(--blue)}
+</style>
+</head>
+<body>
+<main>
+<h1>Irish Aviation: Dublin Airport in Numbers</h1>
+<p class="sub">Official CSO Ireland aviation statistics, passengers only. Data to June 2026.</p>
+<div class="kpis" id="kpis"></div>
+<section><h2>1. Recovery against 2019</h2><div id="c1"></div><p class="cap" id="t1"></p></section>
+<section><h2>2. Seasonality by month</h2><div id="c2"></div><p class="cap" id="t2"></p></section>
+<section><h2>3. Growth by country market, 2022 to 2025</h2><div id="c3"></div><p class="cap" id="t3"></p></section>
+<section><h2>4. Dublin share of Irish airports</h2><div id="c4"></div><p class="cap" id="t4"></p></section>
+<section><h2>5. Market concentration, 2025</h2><div id="c5"></div><p class="cap" id="t5"></p></section>
+<footer>Source: CSO Ireland tables TAA05, TAM08 and TAA06, via data.cso.ie. Built with SQLite and Python.</footer>
+</main>
+<script>
+const D=/*__DATA__*/null;
+const W=520;
+const f1=n=>n.toFixed(1);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const nice=(max,steps)=>{const s=Math.pow(10,Math.floor(Math.log10(max/steps)));for(const m of [1,2,2.5,5,10]){if(m*s*steps>=max)return m*s}return 10*s};
+function frame(h,inner){return `<svg viewBox="0 0 ${W} ${h}" role="img">${inner}</svg>`}
+function yAxis(x0,x1,y0,y1,max,step,fmt,title){let o="";for(let v=0;v<=max+1e-9;v+=step){const y=y0-(v/max)*(y0-y1);o+=`<line class="ax" x1="${x0}" x2="${x1}" y1="${y}" y2="${y}"/><text class="m" x="${x0-6}" y="${y+4}" text-anchor="end" font-size="11">${fmt(v)}</text>`}
+ return o+`<text class="m" font-size="11" transform="translate(12 ${(y0+y1)/2}) rotate(-90)" text-anchor="middle">${title}</text>`}
+
+function c1(){const a=D.q1.filter(r=>r.part=="A_full_year");const x0=56,x1=W-10,y0=220,y1=20,max=40;
+ let o=yAxis(x0,x1,y0,y1,max,10,v=>v,"Passengers (millions)");const bw=(x1-x0)/a.length;
+ a.forEach((r,i)=>{const h=(r.passengers/1e6/max)*(y0-y1),x=x0+i*bw+bw*.15;
+  o+=`<rect x="${x}" y="${y0-h}" width="${bw*.7}" height="${h}" fill="${r.period=="2019"?"var(--grey)":"var(--blue)"}"/>`;
+  o+=`<text x="${x+bw*.35}" y="${y0-h-5}" text-anchor="middle" font-size="11">${r.period=="2019"?"base":(r.pct_vs_2019>0?"+":"")+f1(r.pct_vs_2019)+"%"}</text>`;
+  o+=`<text class="m" x="${x+bw*.35}" y="${y0+16}" text-anchor="middle" font-size="11">${r.period}</text>`});
+ o+=`<text class="m" x="${(x0+x1)/2}" y="250" text-anchor="middle" font-size="11">Year (label = change vs 2019)</text>`;
+ return frame(260,o)}
+
+function c2(){const x0=56,x1=W-10,y0=220,y1=20,max=140;let o=yAxis(x0,x1,y0,y1,max,20,v=>v,"Index (100 = average month)");
+ const dx=(x1-x0)/11;
+ D.months.forEach((m,i)=>o+=`<text class="m" x="${x0+i*dx}" y="${y0+16}" text-anchor="middle" font-size="10">${m}</text>`);
+ const ly=v=>y0-(v/max)*(y0-y1);
+ o+=`<line x1="${x0}" x2="${x1}" y1="${ly(100)}" y2="${ly(100)}" stroke="var(--text)" stroke-dasharray="3 3" opacity=".5"/>`;
+ [[2019,"var(--grey)"],[2025,"var(--blue)"]].forEach(([y,c],k)=>{const rows=D.q2.filter(r=>r.year==y);
+  o+=`<polyline fill="none" stroke="${c}" stroke-width="2.5" points="${rows.map((r,i)=>(x0+i*dx)+","+ly(r.seasonal_index)).join(" ")}"/>`;
+  rows.forEach((r,i)=>o+=`<circle cx="${x0+i*dx}" cy="${ly(r.seasonal_index)}" r="3" fill="${c}"><title>${y} ${D.months[i]}: ${r.seasonal_index}</title></circle>`);
+  o+=`<rect x="${x0+10+k*70}" y="26" width="12" height="12" fill="${c}"/><text x="${x0+28+k*70}" y="37" font-size="12">${y}</text>`});
+ o+=`<text class="m" x="${(x0+x1)/2}" y="250" text-anchor="middle" font-size="11">Month</text>`;return frame(260,o)}
+
+function c3(){const rows=[...D.q3].sort((a,b)=>b.pct_since_2022-a.pct_since_2022);const x0=130,x1=W-40,top=10,rh=17;
+ const mn=Math.min(0,...rows.map(r=>r.pct_since_2022)),mx=Math.max(...rows.map(r=>r.pct_since_2022));
+ const sx=v=>x0+((v-mn)/(mx-mn))*(x1-x0);const h=top+rows.length*rh+40;let o="";
+ rows.forEach((r,i)=>{const y=top+i*rh,v=r.pct_since_2022,xa=sx(Math.min(0,v)),xb=sx(Math.max(0,v));
+  o+=`<text x="${x0-80+ -0}" y="${y+12}" font-size="11" text-anchor="end" dx="76">${esc(r.market.replace(" (1)",""))}</text>`;
+  o+=`<rect x="${xa}" y="${y+2}" width="${Math.max(1,xb-xa)}" height="${rh-5}" fill="${v<0?"var(--red)":"var(--blue)"}"><title>${esc(r.market)}: ${v}%</title></rect>`;
+  o+=`<text class="m" x="${v<0?sx(0)+4:xb+4}" y="${y+12}" font-size="10" text-anchor="start">${(v>0?"+":"")+f1(v)}%</text>`});
+ o+=`<line x1="${sx(0)}" x2="${sx(0)}" y1="${top}" y2="${top+rows.length*rh}" stroke="var(--text)" opacity=".5"/>`;
+ o+=`<text class="m" x="${(x0+x1)/2}" y="${h-8}" text-anchor="middle" font-size="11">Change in passengers, 2025 vs 2022 (%)</text>`;return frame(h,o)}
+
+function c4(){const x0=56,x1=W-10,y0=220,y1=20,lo=70,hi=95,rows=D.q4;const n=rows.length-1;
+ const ly=v=>y0-((v-lo)/(hi-lo))*(y0-y1),dx=(x1-x0)/n;let o="";
+ for(let v=lo;v<=hi;v+=5)o+=`<line class="ax" x1="${x0}" x2="${x1}" y1="${ly(v)}" y2="${ly(v)}"/><text class="m" x="${x0-6}" y="${ly(v)+4}" text-anchor="end" font-size="11">${v}%</text>`;
+ o+=`<text class="m" font-size="11" transform="translate(12 120) rotate(-90)" text-anchor="middle">Dublin share of five airports</text>`;
+ rows.forEach((r,i)=>{if(i%4==0||i==n)o+=`<text class="m" x="${x0+i*dx}" y="${y0+16}" text-anchor="middle" font-size="10">${r.year}</text>`});
+ o+=`<polyline fill="none" stroke="var(--blue)" stroke-width="2.5" points="${rows.map((r,i)=>(x0+i*dx)+","+ly(r.dublin_pct)).join(" ")}"/>`;
+ rows.forEach((r,i)=>{if(i%4==0||i==n||r.year==2019||r.year==2021)o+=`<circle cx="${x0+i*dx}" cy="${ly(r.dublin_pct)}" r="3" fill="var(--blue)"><title>${r.year}: ${r.dublin_pct}%</title></circle><text x="${x0+i*dx}" y="${ly(r.dublin_pct)-8}" text-anchor="middle" font-size="10">${f1(r.dublin_pct)}</text>`});
+ o+=`<text class="m" x="${(x0+x1)/2}" y="250" text-anchor="middle" font-size="11">Year (2020 and 2021 are pandemic years)</text>`;return frame(260,o)}
+
+function c5(){const rows=D.q5.filter(r=>r.year==2025);const x0=120,x1=W-10,top=10,rh=26,max=40;
+ const sx=v=>x0+(v/max)*(x1-x0-110);let o="";
+ rows.forEach((r,i)=>{const y=top+i*rh;
+  o+=`<text x="${x0-8}" y="${y+16}" font-size="12" text-anchor="end">${esc(r.market.replace(" (1)",""))}</text>`;
+  o+=`<rect x="${x0}" y="${y+3}" width="${sx(r.share_pct)-x0}" height="${rh-8}" fill="var(--blue)"><title>${esc(r.market)}: ${r.share_pct}%</title></rect>`;
+  o+=`<text class="m" x="${sx(r.share_pct)+5}" y="${y+16}" font-size="11">${f1(r.share_pct)}% (cum. ${f1(r.cumulative_share_pct)}%)</text>`});
+ const h=top+rows.length*rh+30;o+=`<text class="m" x="${(x0+x1)/2}" y="${h-8}" text-anchor="middle" font-size="11">Share of all Dublin passengers (%)</text>`;return frame(h,o)}
+
+document.getElementById("kpis").innerHTML=D.summary.kpis.map(k=>`<div class="kpi"><b>${esc(k.value)}</b><span>${esc(k.label)}</span></div>`).join("");
+[[c1,"recovery"],[c2,"season"],[c3,"growth"],[c4,"share"],[c5,"concentration"]].forEach(([fn,key],i)=>{
+ document.getElementById("c"+(i+1)).innerHTML=fn();document.getElementById("t"+(i+1)).textContent=D.summary.captions[key]});
+</script>
+</body>
+</html>

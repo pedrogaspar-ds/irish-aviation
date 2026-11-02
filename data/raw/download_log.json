@@ -1,0 +1,26 @@
+{
+  "downloaded": "2026-11-02",
+  "tables": [
+    {
+      "code": "TAA05",
+      "description": "Passengers by airport, annual, 2005 to 2025",
+      "url": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/TAA05/JSON-stat/2.0/en",
+      "cso_updated": "2026-08-05T11:00:00.000Z",
+      "bytes": 4341
+    },
+    {
+      "code": "TAM08",
+      "description": "Passengers handled by main airports, monthly, 2019 to 2026",
+      "url": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/TAM08/JSON-stat/2.0/en",
+      "cso_updated": "2026-08-19T11:00:00.000Z",
+      "bytes": 10016
+    },
+    {
+      "code": "TAA06",
+      "description": "Passengers, freight and flights by airport and country, annual, 2020 to 2025",
+      "url": "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/TAA06/JSON-stat/2.0/en",
+      "cso_updated": "2026-04-16T11:00:00.000Z",
+      "bytes": 244652
+    }
+  ]
+}
