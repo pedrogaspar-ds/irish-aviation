@@ -5,7 +5,9 @@ Dublin Airport and answers each with a SQL query, a chart and a plain conclusion
 
 ![Dashboard](docs/dashboard.png)
 
-Open `dashboard.html` in any browser (double click, no internet needed).
+Live: [pedrogaspar-ds.github.io/irish-aviation](https://pedrogaspar-ds.github.io/irish-aviation/)
+
+Or open `dashboard.html` in any browser (double click, no internet needed).
 
 ## The question
 
