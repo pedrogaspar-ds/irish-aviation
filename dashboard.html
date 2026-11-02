@@ -817,8 +817,9 @@ function opsChart(host, w){
   const gap = Math.min(118, (w - m.l - m.r) / series.length);
   series.forEach((s,i) => {
     el("rect", {x:m.l + i*gap, y:m.t - 16, width:9, height:9, rx:2, fill:css(s.c)}, lg);
-    const t = el("text", {x:m.l + i*gap + 14, y:m.t - 8}, lg);
+    const t = el("text", {x:m.l + i*gap + 13, y:m.t - 8}, lg);
     t.textContent = gap < 90 ? s.label.split(" ")[0] : s.label;
+    if (gap < 95) t.setAttribute("font-size", "10");
   });
 }
 
